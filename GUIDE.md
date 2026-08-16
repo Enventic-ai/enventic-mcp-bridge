@@ -1,106 +1,106 @@
-# Enventic MCP 使用指南
+# Enventic MCP User Guide
 
-从安装到日常使用 · Claude Desktop / Claude Code · 5 分钟接入
-
----
-
-## 目录
-
-1. [MCP 是什么, 能做什么](#1-mcp-是什么-能做什么)
-2. [Enventic MCP 提供的能力](#2-enventic-mcp-提供的能力)
-3. [接入前置条件](#3-接入前置条件)
-4. [Step 1 — 装 bridge](#4-step-1--装-bridge)
-5. [Step 2 — 拿 token](#5-step-2--拿-token)
-6. [Step 3 — 配置 Claude](#6-step-3--配置-claude)
-7. [Step 4 — 重启验证](#7-step-4--重启验证)
-8. [日常使用 (推荐 prompt)](#8-日常使用-推荐-prompt)
-9. [常见问题 & 排错](#9-常见问题--排错)
-10. [安全 & 隐私](#10-安全--隐私)
-11. [Token 管理](#11-token-管理)
+From install to daily use · Claude Desktop / Claude Code · 5-minute setup
 
 ---
 
-## 1. MCP 是什么, 能做什么
+## Contents
 
-**MCP** (Model Context Protocol) 是 Anthropic 开放协议, 让 Claude 直接调外部数据 / 工具 / 流程. 不用打开 Enventic 网站, 直接在 Claude Desktop 里问, Claude 自己调 Enventic 的 API 拿数据回来.
-
-**核心价值**:
-- **数据缺口驱动** — "CSRD 2024 还差哪些数据?" 一句话拉出 51 项清单
-- **数字追溯** — "Scope 2 那 115 tCO₂e 怎么算的?" 秒级返回排放因子 + GWP + 方法论
-- **合规日历** — "今年要交哪些报告, 各自准备了多少?" 一次拿全 9 个 obligation
-- **叙述起草** — "起草 ESRS E1 章节草稿" Claude 直接用 Enventic 数据生成
+1. [What is MCP, and what can it do](#1-what-is-mcp-and-what-can-it-do)
+2. [What Enventic MCP provides](#2-what-enventic-mcp-provides)
+3. [Prerequisites](#3-prerequisites)
+4. [Step 1 — Install the bridge](#4-step-1--install-the-bridge)
+5. [Step 2 — Get your token](#5-step-2--get-your-token)
+6. [Step 3 — Configure Claude](#6-step-3--configure-claude)
+7. [Step 4 — Restart & verify](#7-step-4--restart--verify)
+8. [Everyday usage (recommended prompts)](#8-everyday-usage-recommended-prompts)
+9. [Troubleshooting](#9-troubleshooting)
+10. [Security & privacy](#10-security--privacy)
+11. [Token management](#11-token-management)
 
 ---
 
-## 2. Enventic MCP 提供的能力
+## 1. What is MCP, and what can it do
 
-### 5 Tools (功能)
+**MCP** (Model Context Protocol) is an open protocol from Anthropic that lets Claude talk directly to external data, tools, and workflows. You don't need to open the Enventic web app — just ask Claude Desktop, and Claude calls Enventic's API on your behalf.
 
-| 工具名 | 做什么 | 典型问法 |
+**Core value**:
+- **Data-gap driver** — "What CSRD 2024 inputs am I still missing?" pulls all 51 items in one shot
+- **Number traceability** — "Where does that 115 tCO₂e Scope 2 figure come from?" returns emission factors + GWP set + methodology in seconds
+- **Compliance calendar** — "Which reports do we owe this year, and how ready are we?" returns all 9 obligations with per-item readiness counts
+- **Narrative drafting** — "Draft the ESRS E1 climate section" uses your actual Enventic data
+
+---
+
+## 2. What Enventic MCP provides
+
+### 5 Tools
+
+| Tool | What it does | Sample prompt |
 |---|---|---|
-| `list_disclosure_obligations` | 列监管义务 + readiness | "What reports do we owe this year?" |
-| `get_disclosure_dataset` | 完整披露包 (框架/期间) | "Give me the full ESRS E1 dataset for 2024" |
-| `get_datapoint` | 单点 + 完整 provenance | "Where does dp.esrs.e1.scope2_location come from?" |
-| `get_emissions_inventory` | Scope 1/2/3 + 4 种细分 | "Break down 2024 emissions by site" |
-| `list_required_inputs` | 缺失数据清单 (最常用) | "What data is still missing for CSRD 2024?" |
+| `list_disclosure_obligations` | List regulatory obligations with readiness rollup | "What reports do we owe this year?" |
+| `get_disclosure_dataset` | Full disclosure pack for a framework/period | "Give me the full ESRS E1 dataset for 2024" |
+| `get_datapoint` | Single datapoint with full provenance | "Where does dp.esrs.e1.scope2_location come from?" |
+| `get_emissions_inventory` | Scope 1/2/3 totals plus 4 breakdown modes | "Break down 2024 emissions by site" |
+| `list_required_inputs` | Missing-data checklist (most used) | "What data is still missing for CSRD 2024?" |
 
-### 3 Resources (可读资源)
+### 3 Resources (readable URIs)
 - `disclosure://CSRD_ESRS/{period}`
 - `disclosure://IFRS_S1/{period}`
 - `disclosure://IFRS_S2/{period}`
 
-### 1 Prompt (模板)
-- `draft_disclosure_narrative` — 起草披露章节文本
+### 1 Prompt template
+- `draft_disclosure_narrative` — drafts the narrative text for a disclosure section
 
 ---
 
-## 3. 接入前置条件
+## 3. Prerequisites
 
-| 需要 | 怎么装 |
+| Requirement | How to install |
 |---|---|
-| Claude Desktop *或* Claude Code Desktop | 官网下载, 已装则跳过 |
-| Python 3.10+ | `python3 --version` 检查; 没有跑 `brew install python3` |
-| Enventic 账号 (真账号, 非 demo) | 已注册 `https://www.enventic.ai` |
-| Git | Mac 自带, 或 `brew install git` |
+| Claude Desktop *or* Claude Code Desktop | Download from claude.ai, skip if already installed |
+| Python 3.10+ | Check with `python3 --version`; install with `brew install python3` |
+| Enventic account (real, not demo) | Sign up at `https://www.enventic.ai` |
+| Git | Ships with macOS, or `brew install git` |
 
 ---
 
-## 4. Step 1 — 装 bridge
+## 4. Step 1 — Install the bridge
 
-**克隆 bridge 仓库** (公开 repo, 30 秒完成):
+Clone the bridge repo (public, ~30 seconds):
 
 ```bash
 git clone https://github.com/Enventic-ai/enventic-mcp-bridge.git ~/enventic-mcp-bridge
 ```
 
-装好后目录:
+Installed layout:
 
 ```
 ~/enventic-mcp-bridge/
-  ├── server.py    # stdio 桥 (176 行, 无 pip 依赖)
+  ├── server.py    # stdio bridge (176 lines, stdlib only)
   ├── README.md
-  ├── GUIDE.md     # 本文
+  ├── GUIDE.md     # this guide
   └── .gitignore
 ```
 
-> **为什么需要 bridge**: Claude Desktop 走 stdio JSON-RPC, Enventic 后端是 HTTP. 这个 bridge 把两边翻译. Python 标准库, 不用 pip install.
+> **Why a bridge?** Claude Desktop speaks MCP stdio JSON-RPC; Enventic's backend is HTTP. The bridge translates between them. Pure Python stdlib — no pip install needed.
 
 ---
 
-## 5. Step 2 — 拿 token
+## 5. Step 2 — Get your token
 
-1. **登录 Enventic** — 浏览器打开 `https://www.enventic.ai`, 用真账号登录 (demo 账号不允许).
-2. **访问 token 端点** — 保持登录状态, 浏览器直接打开:
+1. **Sign in to Enventic** — open `https://www.enventic.ai` in your browser with a real account (demo accounts cannot mint tokens).
+2. **Visit the token endpoint** — while signed in, open:
 
    ```
    https://www.enventic.ai/api/mcp/token
    ```
 
-3. **拷 `token` 值**. 页面返回:
+3. **Copy the `token` value**. The page returns:
 
    ```json
    {
-     "token": "eyJhbGciOi.....很长的一串.....",
+     "token": "eyJhbGciOi.....long.....",
      "expires_at": "2026-09-15T04:48:16Z",
      "ttl_days": 30,
      "company_id": 42,
@@ -108,24 +108,24 @@ git clone https://github.com/Enventic-ai/enventic-mcp-bridge.git ~/enventic-mcp-
    }
    ```
 
-   拷 `token` 字段的完整值 (整串 `eyJ...`).
+   Copy the full `token` string (the whole `eyJ...` value).
 
-> ⚠️ **Token 敏感度**: 这是 30 天 bearer 凭证, 携带你的 `company_id`. 别贴到公共聊天 / GitHub / Slack. 只放本机 config 文件.
+> ⚠️ **Token sensitivity**: this is a 30-day bearer credential carrying your `company_id`. Never paste it into public chats, GitHub, Slack, or email. Keep it in your local config file only.
 
 ---
 
-## 6. Step 3 — 配置 Claude
+## 6. Step 3 — Configure Claude
 
-### Claude Desktop (经典聊天 app)
+### Claude Desktop (classic chat app)
 
-打开配置文件:
+Open the config file:
 
 ```bash
 mkdir -p "$HOME/Library/Application Support/Claude"
 open "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 ```
 
-如果文件是空的, 完整粘贴 (记得换 `YOUR-USERNAME` 和 token):
+If empty, paste the block below (replace `YOUR-USERNAME` and paste your token):
 
 ```json
 {
@@ -142,17 +142,17 @@ open "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 }
 ```
 
-如果文件已有内容, 只**加**顶层 `mcpServers` 字段, 别删其他.
+If the file already has other content, only **add** the top-level `mcpServers` field — do not remove existing keys.
 
 ### Claude Code Desktop / CLI
 
-配置文件位置: `~/.claude.json`
+Config file: `~/.claude.json`
 
-加同样 block 到 root 级 `mcpServers`:
+Add the same block at the root level under `mcpServers`:
 
 ```json
 {
-  "...其他配置保留不动...": "",
+  "...preserve other config...": "",
   "mcpServers": {
     "enventic": {
       "type": "stdio",
@@ -169,121 +169,121 @@ open "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
 
 ---
 
-## 7. Step 4 — 重启验证
+## 7. Step 4 — Restart & verify
 
-1. **Cmd+Q** 完全退出 Claude (不是关窗口, 一定要 Cmd+Q).
-2. 重开 Claude.
-3. 验证 3 种方法任选:
-   - **直接问**: "Use enventic to list what data is missing for CSRD 2024." → 应返回 51 条列表
-   - **输入框 `+` / 附件按钮** → 展开菜单应含 `enventic (5 tools)`
-   - **敲 `/mcp`** → 面板显示 `enventic ✓ Connected`
+1. **Cmd+Q** to fully quit Claude (not just close the window — Cmd+Q).
+2. Reopen Claude.
+3. Verify with any of the three methods:
+   - **Ask directly**: "Use enventic to list what data is missing for CSRD 2024." — should return a list of 51 items.
+   - **Input-box `+` / attachment button** — the menu should show `enventic (5 tools)`.
+   - **Type `/mcp`** — the panel should show `enventic ✓ Connected`.
 
-> **没生效常见原因**:
-> - Cmd+Q 没执行 (只点关窗) — Cmd+Tab 到 Claude, 再 Cmd+Q
-> - 路径写错 — `args` 里必须绝对路径, 不能 `~`
-> - Python 找不到 — Terminal 跑 `which python3` 拿绝对路径, 换掉 `"command"` 里的 `"python3"`
-> - Token 过期 (>30 天) — 重访 `/api/mcp/token` 拿新的
+> **Common reasons it didn't take effect**:
+> - Didn't actually Cmd+Q (just closed the window) — Cmd+Tab back to Claude, then Cmd+Q
+> - Wrong path — `args` must be absolute, not `~`
+> - Python not on PATH — run `which python3` in Terminal and replace `"python3"` with the absolute path
+> - Token expired (>30 days) — revisit `/api/mcp/token` to get a fresh one
 
 ---
 
-## 8. 日常使用 (推荐 prompt)
+## 8. Everyday usage (recommended prompts)
 
-### 数据收集场景
+### Data-gathering
 > List every CSRD 2024 input I'm still missing, grouped by domain, and rank them by urgency.
 
-→ Claude 调 `list_required_inputs`, 返 35 项缺失 + 按 A-H 域分组 + 优先级建议
+→ Claude calls `list_required_inputs` and returns 35 missing items grouped by domain A–H with priority guidance.
 
-### 合规进度场景 (CSO/CFO)
+### Compliance progress (CSO/CFO)
 > Which disclosure obligations do we owe this reporting year, and how ready are we on each? Include per-obligation datapoint counts.
 
-→ 调 `list_disclosure_obligations`, 返 9 个 obligation (CSRD/CBAM/IFRS S2/SEC 等) + 每个 ready/missing 计数
+→ Calls `list_disclosure_obligations`, returns 9 obligations (CSRD, CBAM, IFRS S2, SEC Climate, …) with ready/missing counts per item.
 
-### 审计追溯场景
+### Audit trace
 > Where does dp.esrs.e1.scope2_location for 2024 come from? Show me the emission factors, GWP set, and consolidation basis.
 
-→ 调 `get_datapoint`, 返值 + provenance JSON (EF IDs / methodology / audit_trail)
+→ Calls `get_datapoint`, returns the value plus provenance JSON (EF IDs, methodology, audit trail).
 
-### 排放清单场景
+### Emissions inventory
 > Break down our 2024 GHG emissions by site. Which 3 sites contribute the most?
 
-→ 调 `get_emissions_inventory` + `breakdown=by_site`, 返各站 S1/S2/S3 + 排序
+→ Calls `get_emissions_inventory` with `breakdown=by_site`, returns per-site S1/S2/S3 sorted by total.
 
-### 报告起草场景
+### Narrative drafting
 > Draft the ESRS E1 climate narrative for 2024. Ground every figure in the dataset — no invented numbers. Cite each figure by datapoint_id.
 
-→ Claude 用 `draft_disclosure_narrative` prompt + `get_disclosure_dataset`, 生成 400-800 字草稿
+→ Claude combines the `draft_disclosure_narrative` prompt with `get_disclosure_dataset` to produce a 400–800 word draft.
 
-### 双框架场景 (CSRD + IFRS 一次算)
+### Dual-framework (CSRD + IFRS, computed once)
 > Show me the same Scope 1 number as both CSRD ESRS E1-6 and IFRS S2 §29(a)(i). Are they identical?
 
-→ 演示"一次算, 两次映"的差异化能力
+→ Demonstrates the "compute once, map twice" architecture: the same computed number is exposed under both taxonomy references.
 
 ---
 
-## 9. 常见问题 & 排错
+## 9. Troubleshooting
 
-| 问题 | 原因 | 解法 |
+| Symptom | Cause | Fix |
 |---|---|---|
-| `/api/mcp/token` 返 401 | 没登录 / cookie 过期 | 浏览器登录 `www.enventic.ai` 再访问 |
-| `/api/mcp/token` 返 403 `demo_forbidden` | 用了 demo 账号 | 换真账号登录 |
-| Claude Desktop 里 MCP 灰色 / 显示 failed | bridge 启动失败 | 看 macOS Console 搜 "Claude", 常见: python3 找不到, 路径拼错 |
-| 返 `401 token_expired` | Token 过 30 天 | 重访 `/api/mcp/token` |
-| 返 `401 token_too_long_lived` | 使用了 admin 模式但 TTL 超 | 切回 user token 模式 (推荐) |
-| Tool 调用返 "not found" | 没重启 Claude | Cmd+Q 完全退出重开 |
-| 找不到 `python3` | PATH 问题 | 用绝对路径: `/usr/local/bin/python3` 或 `/opt/homebrew/bin/python3` |
+| `/api/mcp/token` returns 401 | Not signed in / cookie expired | Sign in to `www.enventic.ai` first, then retry |
+| `/api/mcp/token` returns 403 `demo_forbidden` | Used a demo account | Sign in with a real account |
+| MCP shows grey / "failed" in Claude Desktop | Bridge failed to start | Open macOS Console, filter by "Claude" — usually `python3` not found or path typo |
+| `401 token_expired` | Token past 30 days | Revisit `/api/mcp/token` |
+| `401 token_too_long_lived` | Admin fallback mode with excessive TTL | Switch back to user-token mode (recommended) |
+| Tool call returns "not found" | Claude wasn't restarted | Cmd+Q fully quit, then reopen |
+| `python3` not found | PATH issue | Use absolute path: `/usr/local/bin/python3` or `/opt/homebrew/bin/python3` |
 
 ---
 
-## 10. 安全 & 隐私
+## 10. Security & privacy
 
-### Token 是什么
-- 30 天有效期的 bearer 凭证, HS256 签名
-- 嵌入你的 `company_id` — 服务器强制租户隔离, 只能看你公司数据
-- 不含密码, 无法反推 Enventic 登录凭证
+### What the token is
+- 30-day bearer credential, HS256-signed JWT
+- Embeds your `company_id` — server enforces tenant isolation; the token can only see your company's data
+- Does not contain your password; cannot be reversed into Enventic login credentials
 
-### 数据传输
-- Bridge (本机) ↔ Enventic (EC2) 走 HTTPS (生产) / HTTP (当前 dev)
-- Claude Desktop ↔ Bridge 走本地 stdio (不出机器)
-- Claude ↔ Anthropic 服务器走 HTTPS (你的 prompt 和 tool 返回都会经 Anthropic)
+### Data transport
+- Bridge (your machine) ↔ Enventic (EC2) — HTTPS (production) / HTTP (current dev)
+- Claude Desktop ↔ Bridge — local stdio (never leaves your machine)
+- Claude ↔ Anthropic servers — HTTPS (your prompts and tool responses do transit Anthropic)
 
-### 你应该做
-- Config 文件设 `chmod 600`:
+### Do
+- Set the config file to `chmod 600`:
   ```bash
   chmod 600 "$HOME/Library/Application Support/Claude/claude_desktop_config.json"
   ```
-- 别把 config 文件提交到 GitHub
-- 换机器时删旧 token
+- Never commit the config file to GitHub
+- Rotate your token when changing machines
 
-### 不要做
-- 把 token 贴到公共 chat / Slack / email
-- 用同一 token 装到多台机器 (虽然能用, 但一泄漏所有机器都要重配)
-- 联系任何声称是 "Enventic 客服" 索要 token 的人
-
----
-
-## 11. Token 管理
-
-### 拿新 token
-重访 `https://www.enventic.ai/api/mcp/token` → 拿新 JSON → 拷 `token` 换到 config → 重启 Claude.
-
-### Token 有效期
-30 天. 到期前 Claude 会返 401. 提前几天换即可.
-
-### Rotate (安全周期)
-推荐每 30 天主动重访 `/api/mcp/token` 换新 token, 不必等自然过期. 老 token 到期后自动失效.
-
-### Revoke (紧急吊销)
-目前只能 Enventic admin 全量 rotate `SERVICE_JWT_SECRET`, 会踢掉所有 outstanding token (包括自己). 单 token revoke 是 Phase 2 功能.
+### Do not
+- Paste the token into public chats, Slack, or email
+- Reuse the same token across multiple machines (works, but a single leak forces re-config everywhere)
+- Give the token to anyone claiming to be "Enventic support" — support never asks for it
 
 ---
 
-## 参考链接
+## 11. Token management
 
-- Bridge 仓库: https://github.com/Enventic-ai/enventic-mcp-bridge
+### Get a new token
+Revisit `https://www.enventic.ai/api/mcp/token` → copy the new `token` → replace in your config → restart Claude.
+
+### Lifetime
+30 days. Claude will return 401 once it expires. Rotate a few days before expiry to avoid interruption.
+
+### Rotation cadence
+Recommended: proactively rotate every 30 days by revisiting `/api/mcp/token`. Old tokens die on their own at expiry.
+
+### Emergency revocation
+Currently only an Enventic admin can revoke by rotating `SERVICE_JWT_SECRET`, which invalidates every outstanding token including their own. Per-token revocation is Phase 2 work.
+
+---
+
+## Reference links
+
+- Bridge repo: https://github.com/Enventic-ai/enventic-mcp-bridge
 - Enventic Web: https://www.enventic.ai
 - Token endpoint: https://www.enventic.ai/api/mcp/token
-- MCP 协议官方: https://modelcontextprotocol.io
+- MCP protocol: https://modelcontextprotocol.io
 
 ---
 
-*Enventic MCP Phase 1 · 生成时间 2026-08-16 · 内部使用*
+*Enventic MCP Phase 1 · Generated 2026-08-16 · Internal use*
