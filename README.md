@@ -17,8 +17,7 @@ Two auth modes:
 ## 1. Get your MCP token (any Enventic user)
 
 1. Sign into Enventic in your browser.
-2. Visit **https://app.enventic.ai/api/mcp/token** (adjust host to match
-   your deployment — the frontend must be one you're logged into).
+2. Visit **https://www.enventic.ai/api/mcp/token**.
 3. You'll see a JSON blob:
    ```json
    {
@@ -37,9 +36,13 @@ tokens keep working until they expire).
 
 ## 2. Install the bridge
 
-Clone this folder anywhere on your machine (a git checkout, a copy in
-`~/enventic-mcp-bridge/`, whatever). Make sure `python3 --version`
-prints 3.10 or newer.
+```bash
+git clone https://github.com/Enventic-ai/enventic-mcp-bridge.git
+cd enventic-mcp-bridge
+```
+
+Make sure `python3 --version` prints 3.10 or newer. No pip install
+needed — stdlib only.
 
 ## 3. Wire into Claude Desktop
 
