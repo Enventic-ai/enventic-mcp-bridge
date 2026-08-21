@@ -14,6 +14,7 @@ From install to daily use · Claude Desktop / Claude Code · 5-minute setup
 6. [Step 3 — Configure Claude](#6-step-3--configure-claude)
 7. [Step 4 — Restart & verify](#7-step-4--restart--verify)
 8. [Everyday usage (recommended prompts)](#8-everyday-usage-recommended-prompts)
+8a. [The full diagnostic workflow](#8a-the-full-diagnostic-workflow)
 9. [Troubleshooting](#9-troubleshooting)
 10. [Security & privacy](#10-security--privacy)
 11. [Token management](#11-token-management)
@@ -34,15 +35,67 @@ From install to daily use · Claude Desktop / Claude Code · 5-minute setup
 
 ## 2. What Enventic MCP provides
 
-### 5 Tools
+### 23 Tools
+
+You never call these by name — you ask in plain language and Claude
+picks the tool. They are grouped below by what you're trying to do.
+
+#### A. Disclosure & data gaps (the CSRD/IFRS reporting surface)
 
 | Tool | What it does | Sample prompt |
 |---|---|---|
-| `list_disclosure_obligations` | List regulatory obligations with readiness rollup | "What reports do we owe this year?" |
+| `list_required_inputs` | Missing-data checklist, live status per input (most used) | "What data is still missing for CSRD 2024?" |
+| `list_disclosure_obligations` | Regulatory obligations + readiness rollup | "What reports do we owe this year and how ready are we?" |
 | `get_disclosure_dataset` | Full disclosure pack for a framework/period | "Give me the full ESRS E1 dataset for 2024" |
-| `get_datapoint` | Single datapoint with full provenance | "Where does dp.esrs.e1.scope2_location come from?" |
-| `get_emissions_inventory` | Scope 1/2/3 totals plus 4 breakdown modes | "Break down 2024 emissions by site" |
-| `list_required_inputs` | Missing-data checklist (most used) | "What data is still missing for CSRD 2024?" |
+| `get_datapoint` | One datapoint with full provenance (EF / GWP / audit trail) | "Where does dp.esrs.e1.scope2_location come from?" |
+| `get_emissions_inventory` | Scope 1/2/3 totals + breakdown by site/category/gas/scope-3 | "Break down 2024 emissions by site" |
+
+#### B. Carbon exposure & targets (CFO-facing)
+
+| Tool | What it does | Sample prompt |
+|---|---|---|
+| `compute_carbon_exposure` | 2030 carbon-cost exposure (low/base/high) + CBAM 2026-2034 ramp | "What's our 2030 carbon-cost exposure under NGFS scenarios?" |
+| `assess_target_trajectory` | On-track / off-track vs a numeric target (handles "below 400" style) | "Are we on track for our 2030 intensity target of below 400?" |
+| `assess_taxonomy_alignment` | EU Taxonomy aligned-share over total capex | "What share of our capex is EU-Taxonomy aligned?" |
+| `assess_transition_financials` | Financial-effect class + scenario-rigour score + locked-in vs budget | "How rigorous is our climate scenario analysis?" |
+
+#### C. Environmental & physical risk (CSO-facing)
+
+| Tool | What it does | Sample prompt |
+|---|---|---|
+| `assess_water_stress` | Share of sites in high / extremely-high water-stress basins | "How exposed are our sites to water stress?" |
+| `assess_nature_exposure` | Share of sites in/near protected areas (WDPA/KBA/Natura2000) | "Which sites sit near biodiversity-sensitive areas?" |
+| `assess_physical_hazard` | Share of sites at high/extreme hazard (flood/heat/cyclone/wildfire) | "What's our physical climate-hazard exposure?" |
+| `assess_pollution_and_waste` | Waste totals + diverted share | "What's our waste diversion rate for 2024?" |
+
+#### D. Credibility & quality
+
+| Tool | What it does | Sample prompt |
+|---|---|---|
+| `check_boundary_break` | Detect restatement / scope-break in a year series (magnitude + NLP) | "Did our Scope 1 series have a boundary break in 2024?" |
+| `evaluate_green_claims` | Flag environmental claims lacking substantiation (never a legal verdict) | "Check this sustainability section for unsubstantiated claims" |
+| `program_region_overlap` | Mismatch between where programs run vs where risk sits | "Do our water programs cover our water-risk hotspots?" |
+| `benchmark_metric` | Peer percentile + position vs a sector panel | "How does our GHG intensity compare to cement peers?" |
+
+#### E. Ingestion
+
+| Tool | What it does | Sample prompt |
+|---|---|---|
+| `extract_disclosure_from_pdf` | Pull datapoints from a report PDF, page-cited, no guessing | "Extract the GHG figures from this sustainability report" |
+| `get_assumptions_register` | The Assumptions Register behind every estimate | "Show me the assumptions behind the exposure number" |
+
+#### F. Diagnostic runs & deliverables (the review workflow)
+
+| Tool | What it does | Sample prompt |
+|---|---|---|
+| `run_diagnostic` | One-shot: create a run, compute the headline, persist findings | "Run a diagnostic for FY2024 with EBIT €500M" |
+| `get_findings` | The findings punch-list for a run, by severity | "What are the findings for that run?" |
+| `generate_run_report` | CFO or CSO HTML report for a run | "Give me the CFO report for that run" |
+| `generate_run_workbook` | Live-formula audit workbook (.xlsx) for a run | "Download the backup workbook for that run" |
+
+> **Note on the `run_id`** — `run_diagnostic` returns a `run_id`. The
+> report / workbook / findings tools take that id. Just say "for that
+> run" and Claude threads it through.
 
 ### 3 Resources (readable URIs)
 - `disclosure://CSRD_ESRS/{period}`
@@ -217,6 +270,58 @@ Add the same block at the root level under `mcpServers`:
 > Show me the same Scope 1 number as both CSRD ESRS E1-6 and IFRS S2 §29(a)(i). Are they identical?
 
 → Demonstrates the "compute once, map twice" architecture: the same computed number is exposed under both taxonomy references.
+
+### Carbon exposure (CFO)
+> What's our 2030 carbon-cost exposure? Size it against EBIT of €500M and show the CBAM ramp.
+
+→ Calls `compute_carbon_exposure`, returns the 2030 low/base/high range in EUR/yr, the 2026-2034 phase-out ramp, and a full-footprint sensitivity. If your sector isn't CBAM-covered the answer flags the cash figure as illustrative.
+
+### Site risk sweep (CSO)
+> Give me our water-stress, biodiversity, and physical-hazard exposure across all sites.
+
+→ Calls `assess_water_stress`, `assess_nature_exposure`, `assess_physical_hazard` — each returns the share of sites exposed plus coverage (how many sites had a match).
+
+---
+
+## 8a. The full diagnostic workflow
+
+The highest-value flow — produce a complete, audit-defensible diagnostic
+in one conversation. You can do it in the web app (**Reporting →
+Diagnostics**) or here in chat:
+
+**1 — Run it**
+> Run a diagnostic for FY2024 with EBIT €500M.
+
+→ `run_diagnostic` creates a run, freezes the parameter snapshot,
+computes the carbon-exposure headline, and persists findings. It
+returns a `run_id`.
+
+**2 — Review the findings**
+> What did it find?
+
+→ `get_findings` lists the punch-list by severity (0 info → 3
+exposure). Each finding is tagged for the CFO and/or CSO audience.
+
+**3 — Get the deliverables**
+> Give me the CFO report and the backup workbook.
+
+→ `generate_run_report` (audience `cfo`) returns the HTML report;
+`generate_run_workbook` returns the live-formula .xlsx (in the web app
+these download / open directly).
+
+**4 — Walk the review gate** *(internal analysts only)*
+
+A run moves `draft → in_review → signed → sent`. In the web app the
+per-run buttons advance it; signing stamps the reviewer. Clients only
+see runs once they're `signed` or `sent`.
+
+**Ingesting a report first (optional).** If you have a PDF and no data
+loaded yet:
+> Extract the GHG figures from this sustainability report [paste text], then run a diagnostic for 2024.
+
+→ `extract_disclosure_from_pdf` pulls page-cited datapoints (it never
+guesses — missing figures come back null), lands them for review, then
+the diagnostic runs on top.
 
 ---
 
