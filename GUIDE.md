@@ -15,6 +15,7 @@ From install to daily use · Claude Desktop / Claude Code · 5-minute setup
 7. [Step 4 — Restart & verify](#7-step-4--restart--verify)
 8. [Everyday usage (recommended prompts)](#8-everyday-usage-recommended-prompts)
 8a. [The full diagnostic workflow](#8a-the-full-diagnostic-workflow)
+8b. [The Review → Exposure arc (Process #1 → #2)](#8b-the-review--exposure-arc-process-1--2)
 9. [Troubleshooting](#9-troubleshooting)
 10. [Security & privacy](#10-security--privacy)
 11. [Token management](#11-token-management)
@@ -35,10 +36,13 @@ From install to daily use · Claude Desktop / Claude Code · 5-minute setup
 
 ## 2. What Enventic MCP provides
 
-### 23 Tools
+### 26 Tools
 
 You never call these by name — you ask in plain language and Claude
 picks the tool. They are grouped below by what you're trying to do.
+
+The three **end-to-end products** in group G are the front doors most
+teams start from; the rest are the building blocks they run on.
 
 #### A. Disclosure & data gaps (the CSRD/IFRS reporting surface)
 
@@ -96,6 +100,20 @@ picks the tool. They are grouped below by what you're trying to do.
 > **Note on the `run_id`** — `run_diagnostic` returns a `run_id`. The
 > report / workbook / findings tools take that id. Just say "for that
 > run" and Claude threads it through.
+
+#### G. End-to-end products (the front doors)
+
+| Tool | What it does | Sample prompt |
+|---|---|---|
+| `review_report` | **Process #1 "Review my report"** — framework gaps, validity/consistency/substantiation, prioritised fix list, peer position. Document-only; ends by seeding Process #2. | "Review our CSRD 2024 report and give me the fix list" |
+| `suggest_competitors` | Scored peer suggestions for a sector (feeds the head-to-head) | "Who are our cement peers for benchmarking?" |
+| `evaluate_risks` | **Process #2 "Evaluate my risks"** — euro exposure as EU free allocation ends: EU ETS cash-line trajectory (today/2030/2034), value-chain CBAM, and physical/water/regulatory flags. Country-level ranges only. | "Size our carbon-cost exposure to 2034 as a share of EBIT" |
+
+> **The Enventic arc** — `review_report` (what does the document say) →
+> `evaluate_risks` (what does it cost the business). Each returns a
+> handoff line inviting the next step. Both ship a review-gate state
+> (draft → in_review → signed → sent) so a client only sees a signed
+> deliverable.
 
 ### 3 Resources (readable URIs)
 - `disclosure://CSRD_ESRS/{period}`
@@ -322,6 +340,37 @@ loaded yet:
 → `extract_disclosure_from_pdf` pulls page-cited datapoints (it never
 guesses — missing figures come back null), lands them for review, then
 the diagnostic runs on top.
+
+---
+
+## 8b. The Review → Exposure arc (Process #1 → #2)
+
+The two front-door products chain: #1 tells you what the document says,
+#2 sizes what it costs the business. Both live in the web app under
+**Reporting → Report Review** and **Reporting → Risk Exposure**, or run
+here in chat.
+
+**1 — Review the report (Process #1)**
+> Review our FY2024 CSRD report. What are the priority gaps and how do we compare to peers?
+
+→ `review_report` returns framework readiness, priority gaps (with the
+full status enum), validity findings (boundary breaks, consistency,
+substantiation, assurance), a prioritised fix list, and the peer
+comparison. It ends with a handoff line into #2.
+
+**2 — Size the exposure (Process #2)**
+> You mentioned a downside. Size our carbon-cost exposure to 2034 as a share of EBIT.
+
+→ `evaluate_risks` returns the EBIT-share headline wedge over time (for
+example "1% today to ~41% by 2034"), the EU ETS cash-line trajectory,
+the value-chain CBAM line (additive for importers, a carve-out view for
+EU producers), and the physical/water/regulatory flags with bands. It
+ends with a handoff into Process #3 (Unlock my Environmental P&L).
+
+**Guardrails you will see in both** — estimate figures ship as labelled
+ranges with the assumptions attached; exposure stays at country level
+(site-level is the platform); a review gate (draft → in_review → signed
+→ sent) means a client only ever sees a signed deliverable.
 
 ---
 
