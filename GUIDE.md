@@ -16,6 +16,7 @@ From install to daily use · Claude Desktop / Claude Code · 5-minute setup
 8. [Everyday usage (recommended prompts)](#8-everyday-usage-recommended-prompts)
 8a. [The full diagnostic workflow](#8a-the-full-diagnostic-workflow)
 8b. [The Review → Exposure arc (Process #1 → #2)](#8b-the-review--exposure-arc-process-1--2)
+8c. [The Exposure → Unlock arc (Process #2 → #3)](#8c-the-exposure--unlock-arc-process-2--3)
 9. [Troubleshooting](#9-troubleshooting)
 10. [Security & privacy](#10-security--privacy)
 11. [Token management](#11-token-management)
@@ -36,7 +37,7 @@ From install to daily use · Claude Desktop / Claude Code · 5-minute setup
 
 ## 2. What Enventic MCP provides
 
-### 26 Tools
+### 28 Tools
 
 You never call these by name — you ask in plain language and Claude
 picks the tool. They are grouped below by what you're trying to do.
@@ -108,10 +109,13 @@ teams start from; the rest are the building blocks they run on.
 | `review_report` | **Process #1 "Review my report"** — framework gaps, validity/consistency/substantiation, prioritised fix list, peer position. Document-only; ends by seeding Process #2. | "Review our CSRD 2024 report and give me the fix list" |
 | `suggest_competitors` | Scored peer suggestions for a sector (feeds the head-to-head) | "Who are our cement peers for benchmarking?" |
 | `evaluate_risks` | **Process #2 "Evaluate my risks"** — euro exposure as EU free allocation ends: EU ETS cash-line trajectory (today/2030/2034), value-chain CBAM, and physical/water/regulatory flags. Country-level ranges only. | "Size our carbon-cost exposure to 2034 as a share of EBIT" |
+| `unlock_environmental_pl` | **Process #3 "Unlock my Environmental P&L"** — sizes the decarbonisation prize: avoided carbon cost (the deployable share of the Evaluate exposure) plus low-carbon revenue and taxonomy upside, both additive; a sector-benchmarked MACC; how far the levers close the target gap; and against-your-own-targets. Consumes the Process #2 output; never recomputes the bill. | "Size the decarbonisation prize for us as a share of EBIT" |
+| `preview_macc` | Lever-only fast path — the sector-benchmarked MACC (levers ranked low to high €/tonne, scaled to remaining headroom) plus gap-closure, with no full run or persistence. | "Show me the cement abatement cost curve" |
 
 > **The Enventic arc** — `review_report` (what does the document say) →
-> `evaluate_risks` (what does it cost the business). Each returns a
-> handoff line inviting the next step. Both ship a review-gate state
+> `evaluate_risks` (what does it cost the business) →
+> `unlock_environmental_pl` (what is the prize for acting). Each returns
+> a handoff line inviting the next step. All ship a review-gate state
 > (draft → in_review → signed → sent) so a client only sees a signed
 > deliverable.
 
@@ -374,6 +378,39 @@ ranges with the assumptions attached; exposure stays at country level
 
 ---
 
+## 8c. The Exposure → Unlock arc (Process #2 → #3)
+
+Evaluate and Unlock are the two sides of your Environmental P&L: cost and
+risk against return and opportunity. Where #2 sizes what the carbon bill
+costs, #3 sizes the prize for acting on it. Lives in the web app under
+**Reporting → Unlock P&L**, or run here in chat.
+
+**1 — Size the prize (Process #3)**
+> Size the decarbonisation prize for us as a share of EBIT. EBIT is €3.1bn, alt-fuel already at 39%.
+
+→ `unlock_environmental_pl` returns THE PRIZE (avoided carbon cost + low-
+carbon and taxonomy upside, both additive, central + range and % of EBIT),
+a sector-benchmarked MACC (levers ranked low to high €/tonne, scaled to
+your remaining headroom), how far the levers close the target gap (ready /
++emerging / +CCUS), and the against-your-own-targets read. The avoided
+carbon cost is the **same deployable share** the gap-closure view shows —
+the two can never diverge. It consumes the Process #2 exposure directly;
+it never recomputes the bill.
+
+**2 — Preview just the curve (optional, cheap)**
+> Show me the cement abatement cost curve without a full run.
+
+→ `preview_macc` returns the MACC table + gap-closure with no persistence
+— a fast way to show the levers before committing to a full Unlock.
+
+**What you will see** — an unknown sector falls back to a generic lever set,
+flagged (never fabricated as sector-specific); no disclosed target ⇒
+against-targets reads `not_applicable`, not a failure; no priced carbon
+cost and no EBIT ⇒ the prize re-anchors on the scenario horizon rather
+than printing €0. The costed, sequenced, plant-level curve is the platform.
+
+---
+
 ## 9. Troubleshooting
 
 | Symptom | Cause | Fix |
@@ -440,4 +477,4 @@ Currently only an Enventic admin can revoke by rotating `SERVICE_JWT_SECRET`, wh
 
 ---
 
-*Enventic MCP Phase 1 · Generated 2026-08-16 · Internal use*
+*Enventic MCP Phase 1 · Generated 2026-08-16 · Updated 2026-09-03 (28 tools · Process #3 Unlock) · Internal use*
